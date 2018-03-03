@@ -102,7 +102,7 @@ const uint8_t adv_data[] = {
     // Flags general discoverable, BR/EDR not supported
     0x02, BLUETOOTH_DATA_TYPE_FLAGS, 0x06, 
     // Name
-    0x0b, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'S', 'M', ' ', 'P', 'a', 'i', 'r', 'i', 'n', 'g', 
+    0x0b, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'B', 'o', 'x', 'U', 'p', ' ', 'L', 'o', 'c', 'k', 
 };
 const uint8_t adv_data_len = sizeof(adv_data);
 

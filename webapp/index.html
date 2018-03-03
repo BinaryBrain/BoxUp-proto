@@ -27,6 +27,10 @@
         <div class="btn">Activate Bluetooth</div>
     </center>
     <script>
+        if (location.protocol === 'http:') {
+            location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+        }
+
         let lockCharacteristic;
         let serviceUuid = 0xff40;
         let characteristicUuid = 0xff42;

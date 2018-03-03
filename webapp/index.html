@@ -1,0 +1,87 @@
+<DOCTYPE html>
+<html>
+<head>
+    <title>BoxUp</title>
+    <style>
+        html {
+            background: url("background.jpg");
+            background-size: cover;
+        }
+        .btn {
+            height: 300px;
+            width: 300px;
+            background: #0101a0;
+            color: white;
+            padding-top: 100px;
+            margin-top: 10%;
+            font-family: sans-serif;
+            font-size: 1.5em;
+            box-sizing: border-box;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <div class="btn">Activate Bluetooth</div>
+    </center>
+    <script>
+        let lockCharacteristic;
+        let serviceUuid = 0xff40;
+        let characteristicUuid = 0xff42;
+        let bluetoothIsPaired = false;
+
+        document.querySelector('.btn').addEventListener('click', () => {
+            if (bluetoothIsPaired) {
+                openLock();
+            } else {
+                initBt();
+            }
+        })
+
+        function initBt() {
+            navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: [serviceUuid]
+            })
+            .then(device => {
+                console.log('Connecting to GATT Server...');
+                device.addEventListener('gattserverdisconnected', () => {
+                    document.querySelector('.btn').innerHTML = "Disconnected...<br>Reactivate Bluetooth";
+                    bluetoothIsPaired = false;
+                })
+                return device.gatt.connect();
+            })
+            .then(server => {
+                console.log('Getting Service...');
+                return server.getPrimaryService(serviceUuid);
+            })
+            .then(service => {
+                console.log('Getting Characteristic...');
+                return service.getCharacteristic(characteristicUuid);
+            })
+            .then(characteristic => {
+                lockCharacteristic = characteristic;
+                bluetoothIsPaired = true;
+                document.querySelector('.btn').innerHTML = "Open Lock<br>BoxUp";
+            })
+            .catch(error => {
+                console.log('Argh! ' + error);
+            });
+        }
+
+        function openLock() {
+            console.log("Writing...");
+            document.querySelector('.btn').innerText = "Opening...";
+            var buffer = new ArrayBuffer(1);
+            var view = new DataView(buffer);
+            view.setInt8(0, 1);
+            lockCharacteristic.writeValue(buffer)
+            .then(() => {
+                document.querySelector('.btn').innerHTML = "Open Lock<br>BoxUp";
+            })
+        }
+    </script>
+</body>
+</html>

@@ -65,10 +65,6 @@
 #include "sm_pairing_peripheral.h"
 #include "btstack.h"
 
-#define ATT_CHARACTERISTIC_0000FF11_0000_1000_8000_00805F9B34FB_01_VALUE_HANDLE 0x000d
-
-#define ATT_CHARACTERISTIC_0000FF11_0000_1000_8000_00805F9B34FB_01_CLIENT_CONFIGURATION_HANDLE 0x000e
-
 #define LOCK1_UUID "0000FF42-0000-1000-8000-00805F9B34FB"
 #define LOCK1_HEX 0xFF42
 
@@ -76,10 +72,6 @@
 #define GPIO_OUTPUT_IO_0    18
 #define GPIO_OUTPUT_IO_1    19
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<GPIO_OUTPUT_IO_0) | (1ULL<<GPIO_OUTPUT_IO_1))
-
-static int  counter = 0;
-static char counter_string[30];
-static int  counter_string_len;
 
 static hci_con_handle_t con_handle;
 
@@ -277,22 +269,21 @@ static int att_write_callback(hci_con_handle_t connection_handle, uint16_t att_h
     printf("\nATT_WRITE_REQUEST --------- (%#010x)\n\n", att_handle);
         
     for(uint16_t i = 0; i < buffer_size; i++) {
-        printf("%x", buffer[i]);
+        printf("data: %x\n", buffer[i]);
     }
 
-    gpio_set_level(GPIO_OUTPUT_IO_0, 1);
-    gpio_set_level(GPIO_OUTPUT_IO_1, 1);
+    if (buffer_size > 0) {
+        gpio_set_level(GPIO_OUTPUT_IO_0, 1);
+        gpio_set_level(GPIO_OUTPUT_IO_1, 1);
 
-    sleep(2);
+        sleep(2);
 
-    gpio_set_level(GPIO_OUTPUT_IO_0, 0);
-    gpio_set_level(GPIO_OUTPUT_IO_1, 0);
+        gpio_set_level(GPIO_OUTPUT_IO_0, 0);
+        gpio_set_level(GPIO_OUTPUT_IO_1, 0);
+    }
 
     printf("\nEND --------- \n");
 
-    // FIXME deprecated
-    if (att_handle != ATT_CHARACTERISTIC_0000FF11_0000_1000_8000_00805F9B34FB_01_CLIENT_CONFIGURATION_HANDLE) return 0;
-    // le_notification_enabled = little_endian_read_16(buffer, 0) == GATT_CLIENT_CHARACTERISTICS_CONFIGURATION_NOTIFICATION;
     con_handle = connection_handle;
     return 0;
 }
